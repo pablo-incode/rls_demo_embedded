@@ -1,0 +1,59 @@
+version: 2
+
+sources:
+  - name: glue_demo
+    database: glue_demo
+    description: >
+      This data source comes from the glue_demo database.\n
+
+      It originates from the analytics_workspace space.\n
+
+      This source is updated daily at around every 15 mins.
+
+    schema: public
+    tables:
+      - name: interviews
+        identifier: interviews
+        description: "This table has millios of records because is one per each sesion, odo we only need the flow name"
+        columns:
+          - name: apikey
+            description: "This is the common dentifier used"
+          - name: configurationname
+            description: "All most everyone is Onboarding but don't know why"
+          - name: configurationid
+            description: "For join with flows._id"
+          - name: clientid
+            description: "Is the Id from the client"
+
+      - name: flows
+        identifier: flows
+        description: "Here is the names of the needed permisions"
+        columns:
+          - name: _id
+            description: "The table primary key"
+          - name: name
+            description: "All most everyone is Onboarding but don't know why"
+          - name: apikey
+            description: "This is the common dentifier used"
+
+      - name: exec
+        identifier: executives
+        description: "Is the table where all the executives are storaged"
+        columns:
+          - name: apikey
+            description: "This is the common dentifier used, the Id is empty some times"
+          - name: email
+            description: "Executive email"
+          - name: organizations_json
+            description: "One executive can have N organizations, when organization is there a json is storaged as an array of organizations IDs"
+          - name: type
+            description: "Is a inplace clasificaction, can be one of this 'ADMIN', 'MULTI_ORG_ADMIN', 'INCODE_EXECUTIVE', 'INTEGRATOR' or others"
+
+      - name: orgs
+        identifier: organizations
+        description: "Is the table where all the organizations are storaged"
+        columns:
+          - name: clientid
+            description: "The id of the client on this organization"
+          - name: apikey
+            description: "Is the API to conect on the system using external tools"

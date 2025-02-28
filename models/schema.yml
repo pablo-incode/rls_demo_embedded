@@ -1,0 +1,184 @@
+version: 2
+
+models:
+  - name: src_demo_exec_filtered
+    config:
+        materialized: ephemeral
+    description: >
+      This model is used to tell the execution plan than first must create the filters on de data,
+
+
+      before extract the organizations from the organizations_json column.
+      
+
+      The filter on this model is: 
+
+
+      WHERE type in ('ADMIN', 'MULTI_ORG_ADMIN', 'INCODE_EXECUTIVE', 'INTEGRATOR')
+
+      and email is not null 
+      
+      and email <> 'dummy'
+
+    columns:
+      - name: apikey
+        description: "This is the common dentifier used, the Id is empty some times, this one no need test because is tested on the source"
+      - name: email
+        description: "Executive email"
+      - name: organizations_json
+        description: "One executive can have N organizations, when organization is there a json is storaged as an array of organizations IDs"
+      - name: type
+        description: "Is a inplace clasificaction, can be one of this 'ADMIN', 'MULTI_ORG_ADMIN', 'INCODE_EXECUTIVE', 'INTEGRATOR' or others"
+      - name: _updatedat
+        description: "When the column was updated, works for incremtal and upserts"
+
+  - name: src_demo_flows
+    config:
+        materialized: ephemeral
+    description: >
+      Is the source flows but only from 2023-01-01 and only the needed columns
+
+    columns:
+      - name: apikey
+        description: "This is the common dentifier used, the Id is empty some times, this one no need test because is tested on the source"
+      - name: _id
+        description: "The flow id"
+      - name: name
+        description: "The name of the flow to grant permisions"
+
+  - name: src_demo_interviews
+    config:
+        materialized: ephemeral
+    description: >
+      Is the source interviews but only from 2023-01-01 and only the needed columns, with a distinct to reduce the amount of data
+
+    columns:
+      - name: apikey
+        description: "This is the common dentifier used, the Id is empty some times, this one no need test because is tested on the source"
+      - name: configurationname
+        description: "The flow name"
+      - name: configurationid
+        description: "To join with flows"
+      - name: clientid
+        description: "Organization id or client if the first is null"
+
+  - name: src_demo_organizations
+    config:
+        materialized: ephemeral
+    description: >
+      Is filtered version of the source organization to exclude some clientids
+
+    columns:
+      - name: apikey
+        description: "This is the common dentifier used, the Id is empty some times, this one no need test because is tested on the source"
+      - name: clientid
+        description: "Organization id"
+
+  - name: dim_demo_execs_wt_flows
+    config:
+        materialized: table
+    description: >
+      This table is a masive join from exeutives with clientid and flows
+    columns:
+      - name: clientid
+        description: "Clientid"
+      - name: email
+        description: "Executive email"
+      - name: name
+        description: "This is the flow name, coms from flows"
+
+  - name: dim_demo_flow_baseline
+    config:
+        materialized: table
+    description: >
+      Tihs model works to avoid cros join, this data is copyed one per every tableu licence
+    columns:
+      - name: clientid
+        description: "Clientid"
+      - name: name
+        description: "This is the flow name, coms from flows"
+
+  - name: dim_demo_execs_split_orgs
+    config:
+        materialized: ephemeral
+    description: >
+      this model split the data for the organization one row for eeach organization
+
+    columns:
+      - name: apikey
+        description: "This is the common dentifier used, the Id is empty some times, this one no need test because is tested on the source"
+      - name: email
+        description: "Executive email"
+      - name: org
+        description: "this column is created from the split result of the orgs_json"
+
+  - name: dim_demo_execs_with_clientids
+    config:
+        materialized: table
+    description: >
+      This is a join using executives and organizations to extract the clientid from the organization, the left join is replaced for innner join to apply the filters form organizations
+      and a DISTINCT clausule is applied to avoid unncesary data
+
+    columns:    
+      - name: apikey
+        description: "This is the common dentifier usede"
+      - name: clientid
+        description: "Is the cleaned organization value,this column is created from the split result of the orgs_json"
+      - name: email
+        description: "Executive email"
+
+  - name: dim_demo_incode_wt_flow
+    config:
+        materialized: table
+    description: >
+      This table is done with jinja, because the crosjoin was a bad practice, now take only few seconds, this is the final result for permision for incode employes
+
+    columns:
+      - name: clientid
+        description: "Comes from organizations"
+      - name: email
+        description: "The email with tableo licence"
+      - name: name
+        description: "Comes from interviews but first a join with flows and the default value is 'Onboarding' for the ull values"
+
+  - name: dim_demo_flow_names
+    config:
+        materialized: table
+    description: >
+      Find the flow name by join of interviews, organizations and flows 16M+ records but the execution is fast
+
+    columns:
+      - name: clientid
+        description: "Comes from organizations"
+      - name: name
+        description: "Comes from interviews but first a join with flows and the default value is 'Onboarding' for the ull values"
+
+  - name: dim_tableu_lics
+    config:
+        materialized: table
+    description: >
+      Is table because jinja do not admit ephemeral for the query but it is a source
+
+    columns:
+      - name: email
+        description: "The src_demo_exec_filtered is filtered to admit only a few types, those types are configured on this seed for best practices"
+
+
+seeds:
+  - name: seed_demo_accepted_tableau_lics
+    description: "The src_demo_exec_filtered is filtered to admit only a few types, those types are configured on this seed for best practices"
+    columns:
+      - name: email
+        description: "This emails are the ones with permisions to tableu"
+
+  - name: seed_demo_exec_admitted_types
+    description: "The src_demo_exec_filtered is filtered to admit only a few types, those types are configured on this seed for best practices"
+    columns:
+      - name: admited_type
+        description: "There is a sigle column where all the adminted types are alocated"
+
+  - name: seed_demo_rejected_clients
+    description: "The src_demo_organizations is filtered to reject a few clientids, those are configured on this seed for best practices"
+    columns:
+      - name: rejected_client
+        description: "There is a sigle column where all the rejected are alocated"
