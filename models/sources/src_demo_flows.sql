@@ -1,6 +1,6 @@
-select  
-    _id, 
-    name, 
+select 
+    _id,
+    name,
     apikey
-from {{source('glue_demo','flows')}}
-where _createdat >= 1672531200000 --Jan2023 
+from {{ source('glue_demo', 'flows') }}
+WHERE _createdat >= 1672531200000

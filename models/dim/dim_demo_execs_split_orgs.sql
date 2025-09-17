@@ -1,4 +1,4 @@
-{{ config(materialized='ephemeral') }}
+{{ config(materialized='table') }}
 
 with prep AS (
   select 1 as n union all

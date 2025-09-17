@@ -112,7 +112,7 @@ models:
       - name: org
         description: "this column is created from the split result of the orgs_json"
 
-  - name: dim_demo_execs_with_clientids
+  - name: dim_demo_execs_with_clientid
     config:
         materialized: table
     description: >
@@ -153,7 +153,7 @@ models:
       - name: name
         description: "Comes from interviews but first a join with flows and the default value is 'Onboarding' for the ull values"
 
-  - name: dim_tableu_lics
+  - name: dim_demo_tableu_lics
     config:
         materialized: table
     description: >
@@ -161,24 +161,24 @@ models:
 
     columns:
       - name: email
-        description: "The src_demo_exec_filtered is filtered to admit only a few types, those types are configured on this seed for best practices"
+        description: "The src_exec_filtered is filtered to admit only a few types, those types are configured on this seed for best practices"
 
 
 seeds:
-  - name: seed_demo_accepted_tableau_lics
-    description: "The src_demo_exec_filtered is filtered to admit only a few types, those types are configured on this seed for best practices"
+  - name: seed_demo_acepted_tableu_lics
+    description: "The src_exec_filtered is filtered to admit only a few types, those types are configured on this seed for best practices"
     columns:
       - name: email
         description: "This emails are the ones with permisions to tableu"
 
-  - name: seed_demo_exec_admitted_types
-    description: "The src_demo_exec_filtered is filtered to admit only a few types, those types are configured on this seed for best practices"
+  - name: seed_demo_exec_admited_types
+    description: "The src_exec_filtered is filtered to admit only a few types, those types are configured on this seed for best practices"
     columns:
       - name: admited_type
         description: "There is a sigle column where all the adminted types are alocated"
 
   - name: seed_demo_rejected_clients
-    description: "The src_demo_organizations is filtered to reject a few clientids, those are configured on this seed for best practices"
+    description: "The src_organizations is filtered to reject a few clientids, those are configured on this seed for best practices"
     columns:
       - name: rejected_client
         description: "There is a sigle column where all the rejected are alocated"

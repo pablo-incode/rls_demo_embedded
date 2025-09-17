@@ -2,7 +2,8 @@
     dist='clientid',
     sort=['clientid','apikey']
 ) }}
-select case when replace(replace(replace(org, ']', ''),'"',''),'[','') = '' then org.clientid
+select distinct 
+       case when replace(replace(replace(org, ']', ''),'"',''),'[','') = '' then org.clientid
             else  replace(replace(replace(org, ']', ''),'"',''),'[','')
        end as clientid,
        exec.email,
