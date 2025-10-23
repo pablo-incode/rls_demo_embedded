@@ -7,4 +7,4 @@ inner join {{ ref('dim_demo_flow_names') }} as flow
 where not org.clientid is null
 union 
 select clientid,name
-from public.dim_flow_names flows
+from  {{ ref('dim_demo_flow_names') }} flows
